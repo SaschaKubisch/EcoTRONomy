@@ -1,31 +1,47 @@
-carbon-credit-marketplace/
-|-- contracts/
-|   |-- MasterContract.sol
-|   |-- BridgeContract.sol
-|   |-- PoolContract.sol
-|   |-- MarketplaceContract.sol
-|   |-- ERC20COToken.sol
-|   |-- ERC1155COCredits.sol
-|   |-- CarbonSwapBridge.sol
-|-- test/
-|   |-- MasterContract.test.js
-|   |-- BridgeContract.test.js
-|   |-- PoolContract.test.js
-|   |-- MarketplaceContract.test.js
-|   |-- ERC20COToken.test.js
-|   |-- ERC1155COCredits.test.js
-|   |-- CarbonSwapBridge.test.js
-|-- scripts/
-|   |-- deploy.js
-|-- frontend/
-|   |-- src/
-|   |   |-- components/
-|   |   |   |-- Dashboard.js
-|   |   |   |-- BuyCredits.js
-|   |   |   |-- SellCredits.js
-|   |   |   |-- OffsetCredits.js
-|   |   |-- App.js
-|   |   |-- index.js
-|-- hardhat.config.js
-|-- package.json
-|-- README.md
+project_root/
+│
+├── smart_contracts/
+│   ├── MasterContract.sol
+│   ├── BridgeContract.sol
+│   ├── MarketplaceContract.sol
+│   └── ERC20CO2Token.sol
+│
+├── backend/
+│   ├── app.js
+│   ├── config.js
+│   ├── package.json
+│   └── .env
+│   ├── api/
+│   │   ├── routes.js
+│   │   ├── controllers/
+│   │   │   ├── carbonCreditsController.js
+│   │   │   ├── marketplaceController.js
+│   │   │   └── userController.js
+│   │   └── services/
+│   │       ├── carbonCreditsService.js
+│   │       ├── marketplaceService.js
+│   │       └── userService.js
+│   └── utils/
+│       ├── ipfsUtils.js
+│       ├── tronUtils.js
+│       └── web3Utils.js
+│
+└── frontend/
+    ├── index.html
+    ├── style.css
+    ├── main.js
+    ├── components/
+    │   ├── CarbonCreditsList.js
+    │   ├── BuyCarbonCredits.js
+    │   ├── SellCarbonCredits.js
+    │   ├── OffsetCarbonCredits.js
+    │   ├── UserWallet.js
+    │   └── CarbonCreditsVerification.js
+    ├── services/
+    │   ├── carbonCreditsService.js
+    │   ├── marketplaceService.js
+    │   └── userService.js
+    └── utils/
+        ├── ipfsUtils.js
+        ├── tronUtils.js
+        └── web3Utils.js

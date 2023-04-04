@@ -1,55 +1,71 @@
-// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
-import "./PoolContract.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./Bridge.sol";
 
-contract MarketplaceContract {
-    address public owner;
-    PoolContract public poolContract;
-    IERC1155 public erc1155Token;
+contract Marketplace {
+    address public admin;
+    Bridge public bridge;
+    
+    mapping(address => uint256) public co2TokensPrices;
 
-    mapping(uint256 => uint256) public tokenPrice;
+    event BuyCarbonCredits(
+        address indexed buyer,
+        address indexed token,
+        uint256 amount,
+        uint256 price
+    );
 
-    event TokenPurchased(uint256 tokenId, address buyer, uint256 amount);
-    event TokenListed(uint256 tokenId, uint256 price);
-    event TokenDelisted(uint256 tokenId);
+    event SellCarbonCredits(
+        address indexed seller,
+        address indexed token,
+        uint256 amount,
+        uint256 price
+    );
 
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Caller is not the owner");
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "Not admin");
         _;
     }
 
-    constructor(address _poolContractAddress, address _erc1155TokenAddress) {
-        owner = msg.sender;
-        poolContract = PoolContract(_poolContractAddress);
-        erc1155Token = IERC1155(_erc1155TokenAddress);
+    constructor(address _bridge) {
+        admin = msg.sender;
+        bridge = Bridge(_bridge);
     }
 
-    function buyTokens(uint256 tokenId, uint256 amount) external payable {
-        uint256 price = tokenPrice[tokenId];
-        require(price > 0, "Token not for sale");
-        uint256 cost = price * amount;
-
-        require(msg.value >= cost, "Insufficient funds");
-
-        poolContract.mintCO2Tokens(msg.sender, tokenId, amount);
-        erc1155Token.safeTransferFrom(address(this), msg.sender, tokenId, amount, "");
-
-        if (msg.value > cost) {
-            payable(msg.sender).transfer(msg.value - cost);
-        }
-
-        emit TokenPurchased(tokenId, msg.sender, amount);
+    function setTokenPrice(address token, uint256 price) external onlyAdmin {
+        co2TokensPrices[token] = price;
     }
 
-    function listToken(uint256 tokenId, uint256 price) external onlyOwner {
-        tokenPrice[tokenId] = price;
-        emit TokenListed(tokenId, price);
+    function buyCarbonCredits(address token, uint256 amount) external payable {
+        uint256 price = co2TokensPrices[token];
+        uint256 totalCost = price * amount;
+
+        require(totalCost > 0, "Price not set");
+        require(msg.value >= totalCost, "Insufficient funds");
+
+        IERC20(token).transferFrom(address(this), msg.sender, amount);
+
+        emit BuyCarbonCredits(msg.sender, token, amount, price);
     }
 
-    function delistToken(uint256 tokenId) external onlyOwner {
-        tokenPrice[tokenId] = 0;
-        emit TokenDelisted(tokenId);
+    function sellCarbonCredits(address token, uint256 amount, uint256 price) external {
+        IERC20(token).transferFrom(msg.sender, address(this), amount);
+        co2TokensPrices[token] = price;
+
+        emit SellCarbonCredits(msg.sender, token, amount, price);
     }
+
+    function executeTrade(address token, uint256 amount) external payable {
+        uint256 price = co2TokensPrices[token];
+        uint256 totalCost = price * amount;
+
+        require(totalCost > 0, "Price not set");
+        require(msg.value >= totalCost, "Insufficient funds");
+
+        IERC20(token).transfer(msg.sender, amount);
+
+        emit BuyCarbonCredits(msg.sender, token, amount, price);
+    }
+
 }
