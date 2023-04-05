@@ -2,7 +2,7 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
 describe("Integration Tests", function () {
-  let MasterContract, BridgeContract, ERC20CO2Token, MarketplaceContract;
+  let MasterContract, BridgeContract, CO2Token, MarketplaceContract;
   let master, bridge, token, marketplace;
   let owner, issuer, verifier, buyer, seller;
 
@@ -17,9 +17,9 @@ describe("Integration Tests", function () {
     bridge = await BridgeContract.deploy(master.address);
     await bridge.deployed();
 
-    // Deploy ERC20CO2Token
-    ERC20CO2Token = await ethers.getContractFactory("ERC20CO2Token");
-    token = await ERC20CO2Token.deploy();
+    // Deploy CO2Token
+    CO2Token = await ethers.getContractFactory("CO2Token");
+    token = await CO2Token.deploy();
     await token.deployed();
 
     // Deploy MarketplaceContract

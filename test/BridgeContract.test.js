@@ -2,12 +2,12 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
 describe("BridgeContract", function () {
-  let BridgeContract, ERC20CO2Token, bridge, token, owner, issuer, verifier;
+  let BridgeContract, CO2Token, bridge, token, owner, issuer, verifier;
 
   beforeEach(async () => {
-    // Deploy ERC20CO2Token contract
-    ERC20CO2Token = await ethers.getContractFactory("ERC20CO2Token");
-    token = await ERC20CO2Token.deploy();
+    // Deploy CO2Token contract
+    CO2Token = await ethers.getContractFactory("CO2Token");
+    token = await CO2Token.deploy();
     await token.deployed();
 
     // Deploy BridgeContract

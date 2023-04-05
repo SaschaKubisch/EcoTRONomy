@@ -1,7 +1,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./Bridge.sol";
+import "./BridgeContract.sol";
 
 contract Marketplace {
     address public admin;

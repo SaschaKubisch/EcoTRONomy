@@ -1,13 +1,13 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("ERC20CO2Token", function () {
-  let ERC20CO2Token, token, owner, addr1, addr2;
+describe("CO2Token", function () {
+  let CO2Token, token, owner, addr1, addr2;
 
   beforeEach(async () => {
-    // Deploy ERC20CO2Token contract
-    ERC20CO2Token = await ethers.getContractFactory("ERC20CO2Token");
-    token = await ERC20CO2Token.deploy();
+    // Deploy CO2Token contract
+    CO2Token = await ethers.getContractFactory("CO2Token");
+    token = await CO2Token.deploy();
     await token.deployed();
 
     // Get signers
