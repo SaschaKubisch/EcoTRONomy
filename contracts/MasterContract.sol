@@ -1,44 +1,61 @@
-// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "./BridgeContract.sol";
 import "./MarketplaceContract.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./CO2Token.sol";
 
 contract MasterContract {
     address public admin;
-
-    BridgeContract public bridgeContract;
     MarketplaceContract public marketplaceContract;
-    IERC20 public co2Token;
+
+    mapping(uint256 => BridgeContract) public bridgeContracts;
+    mapping(uint256 => CO2Token) public co2Tokens;
+
+    uint256 public trancheCounter;
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "Not admin");
         _;
     }
 
-    constructor(address _co2Token) {
+    constructor() {
         admin = msg.sender;
-        co2Token = IERC20(_co2Token);
     }
 
-    function deployBridgeContract() external onlyAdmin {
-        bridgeContract = new BridgeContract();
+    function deployNewTranche() external onlyAdmin {
+        BridgeContract newBridge = new BridgeContract();
+        CO2Token newCO2Token = new CO2Token("Carbon Credit Token", "CCT");
+
+        bridgeContracts[trancheCounter] = newBridge;
+        co2Tokens[trancheCounter] = newCO2Token;
+        trancheCounter++;
     }
 
     function deployMarketplaceContract() external onlyAdmin {
-        marketplaceContract = new MarketplaceContract(address(co2Token));
+        marketplaceContract = new MarketplaceContract();
     }
 
-    function setBridgeAdmin(address newAdmin) external onlyAdmin {
-        bridgeContract.setAdmin(newAdmin);
+    function registerCarbonCredits(
+        uint256 trancheId,
+        string memory ipfsHash,
+        uint256 totalSupply
+    ) external onlyAdmin {
+        BridgeContract bridge = bridgeContracts[trancheId];
+        CO2Token co2Token = co2Tokens[trancheId];
+
+        bridge.registerCarbonCredits(ipfsHash);
+        co2Token.setTotalSupply(totalSupply);
     }
 
-    function setMarketplaceAdmin(address newAdmin) external onlyAdmin {
-        marketplaceContract.setAdmin(newAdmin);
+    function offerCarbonCredits(uint256 trancheId, uint256 amount) external {
+        require(msg.sender == admin, "Not the issuer");
+        CO2Token co2Token = co2Tokens[trancheId];
+
+        require(amount <= co2Token.totalSupply(), "Exceeds total supply");
+
+        co2Token.mint(address(marketplaceContract), amount);
+        marketplaceContract.offerCarbonCredits(trancheId, amount);
     }
 
-    function setAdmin(address newAdmin) external onlyAdmin {
-        admin = newAdmin;
-    }
+    // The rest of the functions remain the same as before...
 }

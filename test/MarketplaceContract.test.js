@@ -2,7 +2,7 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
 describe("MarketplaceContract", function () {
-  let MarketplaceContract, ERC20CO2Token, marketplace, token, owner, buyer, seller;
+  let MarketplaceContract, ERC20CO2Token, BridgeContract, marketplace, token, bridge, owner, buyer, seller;
 
   beforeEach(async () => {
     // Deploy ERC20CO2Token contract
@@ -10,44 +10,47 @@ describe("MarketplaceContract", function () {
     token = await ERC20CO2Token.deploy();
     await token.deployed();
 
+    // Deploy BridgeContract
+    BridgeContract = await ethers.getContractFactory("BridgeContract");
+    bridge = await BridgeContract.deploy(token.address);
+    await bridge.deployed();
+
     // Deploy MarketplaceContract
     MarketplaceContract = await ethers.getContractFactory("MarketplaceContract");
-    marketplace = await MarketplaceContract.deploy(token.address);
+    marketplace = await MarketplaceContract.deploy(token.address, bridge.address);
     await marketplace.deployed();
 
     // Get signers
     [owner, buyer, seller] = await ethers.getSigners();
   });
 
-  it("Should create a sell order", async function () {
-    const amount = ethers.utils.parseUnits("100", 18);
+  it("Should offer CO2 tokens for sale", async function () {
+    const amountToOffer = ethers.utils.parseUnits("100", 18);
+    await token.connect(seller).approve(marketplace.address, amountToOffer);
+    await marketplace.connect(seller).offerCO2Tokens(amountToOffer);
 
-    await token.connect(seller).mint(seller.address, amount);
-    await token.connect(seller).approve(marketplace.address, amount);
-
-    await marketplace.connect(seller).createSellOrder(amount, 1);
-
-    const sellOrder = await marketplace.sellOrders(0);
-    expect(sellOrder.seller).to.equal(seller.address);
-    expect(sellOrder.amount).to.equal(amount);
-    expect(sellOrder.pricePerToken).to.equal(1);
+    const offer = await marketplace.offers(seller.address);
+    expect(offer.seller).to.equal(seller.address);
+    expect(offer.amount).to.equal(amountToOffer);
   });
 
-  it("Should execute a trade", async function () {
-    const amount = ethers.utils.parseUnits("100", 18);
-    const pricePerToken = 1;
-    const totalPrice = amount.mul(pricePerToken);
+  it("Should allow buyer to purchase CO2 tokens", async function () {
+    const amountToBuy = ethers.utils.parseUnits("50", 18);
 
-    // Seller creates a sell order
-    await token.connect(seller).mint(seller.address, amount);
-    await token.connect(seller).approve(marketplace.address, amount);
-    await marketplace.connect(seller).createSellOrder(amount, pricePerToken);
+    // Offer tokens for sale
+    const amountToOffer = ethers.utils.parseUnits("100", 18);
+    await token.connect(seller).approve(marketplace.address, amountToOffer);
+    await marketplace.connect(seller).offerCO2Tokens(amountToOffer);
 
-    // Buyer executes the trade
-    await marketplace.connect(buyer).buyTokens(0, { value: totalPrice });
+    // Buyer purchases tokens
+    await token.connect(buyer).approve(marketplace.address, amountToBuy);
+    await marketplace.connect(buyer).buyCO2Tokens(seller.address, amountToBuy);
 
-    // Check balances
-    expect(await token.balanceOf(seller.address)).to.equal(0);
-    expect(await token.balanceOf(buyer.address)).to.equal(amount);
+    const sellerBalance = await token.balanceOf(seller.address);
+    const buyerBalance = await token.balanceOf(buyer.address);
+
+    expect(sellerBalance).to.equal(amountToOffer.sub(amountToBuy));
+    expect(buyerBalance).to.equal(amountToBuy);
   });
 });
+
