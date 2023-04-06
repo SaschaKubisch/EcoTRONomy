@@ -57,5 +57,5 @@ contract MasterContract {
         marketplaceContract.offerCarbonCredits(trancheId, amount);
     }
 
-    // The rest of the functions remain the same as before...
+
 }

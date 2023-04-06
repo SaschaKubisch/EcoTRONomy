@@ -3,9 +3,9 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./BridgeContract.sol";
 
-contract Marketplace {
+contract MarketplaceContract {
     address public admin;
-    Bridge public bridge;
+    BridgeContract public bridge;
     
     mapping(address => uint256) public co2TokensPrices;
 
@@ -30,7 +30,7 @@ contract Marketplace {
 
     constructor(address _bridge) {
         admin = msg.sender;
-        bridge = Bridge(_bridge);
+        bridge = BridgeContract(_bridge);
     }
 
     function setTokenPrice(address token, uint256 price) external onlyAdmin {
