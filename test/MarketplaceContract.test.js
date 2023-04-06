@@ -2,7 +2,7 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
 describe("MarketplaceContract", function () {
-  let MarketplaceContract, CO2Token, BridgeContract, marketplace, token, bridge, owner, buyer, seller;
+  let MarketplaceContract, CO2Token, RegistryContract, marketplace, token, registry, owner, buyer, seller;
 
   beforeEach(async () => {
     // Deploy CO2Token contract
@@ -10,14 +10,14 @@ describe("MarketplaceContract", function () {
     token = await CO2Token.deploy();
     await token.deployed();
 
-    // Deploy BridgeContract
-    BridgeContract = await ethers.getContractFactory("BridgeContract");
-    bridge = await BridgeContract.deploy(token.address);
-    await bridge.deployed();
+    // Deploy RegistryContract
+    RegistryContract = await ethers.getContractFactory("RegistryContract");
+    registry = await RegistryContract.deploy(token.address);
+    await registry.deployed();
 
     // Deploy MarketplaceContract
     MarketplaceContract = await ethers.getContractFactory("MarketplaceContract");
-    marketplace = await MarketplaceContract.deploy(token.address, bridge.address);
+    marketplace = await MarketplaceContract.deploy(token.address, registry.address);
     await marketplace.deployed();
 
     // Get signers

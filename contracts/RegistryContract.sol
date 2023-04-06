@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./CO2Token.sol";
 
-contract BridgeContract {
+contract RegistryContract {
     struct CarbonCreditData {
         uint256 id;
         uint256 totalSupply;

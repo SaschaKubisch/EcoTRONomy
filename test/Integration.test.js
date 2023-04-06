@@ -2,8 +2,8 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
 describe("Integration Tests", function () {
-  let MasterContract, BridgeContract, CO2Token, MarketplaceContract;
-  let master, bridge, token, marketplace;
+  let MasterContract, RegistryContract, CO2Token, MarketplaceContract;
+  let master, registry, token, marketplace;
   let owner, issuer, verifier, buyer, seller;
 
   beforeEach(async () => {
@@ -12,10 +12,10 @@ describe("Integration Tests", function () {
     master = await MasterContract.deploy();
     await master.deployed();
 
-    // Deploy BridgeContract
-    BridgeContract = await ethers.getContractFactory("BridgeContract");
-    bridge = await BridgeContract.deploy(master.address);
-    await bridge.deployed();
+    // Deploy RegistryContract
+    RegistryContract = await ethers.getContractFactory("RegistryContract");
+    registry = await RegistryContract.deploy(master.address);
+    await registry.deployed();
 
     // Deploy CO2Token
     CO2Token = await ethers.getContractFactory("CO2Token");
@@ -38,11 +38,11 @@ describe("Integration Tests", function () {
   it("Should register, mint, offer, and buy carbon credits correctly", async function () {
     // Register carbon credits
     const carbonCreditsData = "QmRiW5M5S5MJ5q3y5Y1B5W1m8d4G4fJh8W8Cbb7Y5z6a5x";
-    await bridge.connect(issuer).registerCarbonCredits(carbonCreditsData);
+    await registry.connect(issuer).registerCarbonCredits(carbonCreditsData);
 
     // Verify carbon credits
     const carbonCreditsId = 1;
-    await bridge.connect(verifier).verifyCarbonCredits(carbonCreditsId);
+    await registry.connect(verifier).verifyCarbonCredits(carbonCreditsId);
 
     // Mint and offer carbon credits
     const amountToMint = ethers.utils.parseUnits("1000", 18);

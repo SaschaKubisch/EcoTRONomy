@@ -1,6 +1,6 @@
 pragma solidity ^0.8.0;
 
-import "./BridgeContract.sol";
+import "./RegistryContract.sol";
 import "./MarketplaceContract.sol";
 import "./CO2Token.sol";
 
@@ -8,7 +8,7 @@ contract MasterContract {
     address public admin;
     MarketplaceContract public marketplaceContract;
 
-    mapping(uint256 => BridgeContract) public bridgeContracts;
+    mapping(uint256 => RegistryContract) public RegistryContracts;
     mapping(uint256 => CO2Token) public co2Tokens;
 
     uint256 public trancheCounter;
@@ -23,10 +23,10 @@ contract MasterContract {
     }
 
     function deployNewTranche() external onlyAdmin {
-        BridgeContract newBridge = new BridgeContract();
+        RegistryContract newRegistry = new RegistryContract();
         CO2Token newCO2Token = new CO2Token("Carbon Credit Token", "CCT");
 
-        bridgeContracts[trancheCounter] = newBridge;
+        RegistryContracts[trancheCounter] = newRegistry;
         co2Tokens[trancheCounter] = newCO2Token;
         trancheCounter++;
     }
@@ -40,10 +40,10 @@ contract MasterContract {
         string memory ipfsHash,
         uint256 totalSupply
     ) external onlyAdmin {
-        BridgeContract bridge = bridgeContracts[trancheId];
+        RegistryContract registry = RegistryContracts[trancheId];
         CO2Token co2Token = co2Tokens[trancheId];
 
-        bridge.registerCarbonCredits(ipfsHash);
+        registry.registerCarbonCredits(ipfsHash);
         co2Token.setTotalSupply(totalSupply);
     }
 
