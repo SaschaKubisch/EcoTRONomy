@@ -23,7 +23,6 @@ Backend -> BridgeContract: Call `mint` function with carbon credit data
 BridgeContract -> GoldStandardWrapperContract: Confirm carbon credit tokenization
 
 
-
 BridgeContract -> ERC1155Contract: Create new ERC-1155 tokens
 ERC1155Contract -> BridgeContract: Return token ID
 BridgeContract -> Backend: Update token supply

@@ -1,48 +1,54 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("RegistryContract", function () {
-  let RegistryContract, CO2Token, registry, token, owner, issuer, verifier;
+describe("CarbonCreditBridgeContract", function () {
+  let CarbonCreditBridge, carbonCreditBridge, CarbonCreditERC1155, carbonCreditERC1155, WrappedBCT, wrappedBCT, owner, addr1, addr2;
 
-  beforeEach(async () => {
-    // Deploy CO2Token contract
-    CO2Token = await ethers.getContractFactory("CO2Token");
-    token = await CO2Token.deploy();
-    await token.deployed();
+  beforeEach(async function () {
+    // Deploy CarbonCreditERC1155 contract
+    CarbonCreditERC1155 = await ethers.getContractFactory("CarbonCreditERC1155");
+    [owner, addr1, addr2, _] = await ethers.getSigners();
+    carbonCreditERC1155 = await CarbonCreditERC1155.deploy("https://example.com/metadata/");
+    
+    // Deploy WrappedBCT contract
+    WrappedBCT = await ethers.getContractFactory("WrappedBCT");
+    wrappedBCT = await WrappedBCT.deploy(carbonCreditERC1155.address);
 
-    // Deploy RegistryContract
-    RegistryContract = await ethers.getContractFactory("RegistryContract");
-    registry = await RegistryContract.deploy(token.address);
-    await registry.deployed();
-
-    // Get signers
-    [owner, issuer, verifier] = await ethers.getSigners();
+    // Deploy CarbonCreditBridgeContract
+    CarbonCreditBridge = await ethers.getContractFactory("CarbonCreditBridgeContract");
+    carbonCreditBridge = await CarbonCreditBridge.deploy(carbonCreditERC1155.address, wrappedBCT.address);
   });
 
-  it("Should register carbon credits", async function () {
-    const metadataURI = "ipfs://metadataURI";
-    await registry.connect(issuer).registerCarbonCredits(metadataURI, issuer.address);
-    const carbonCredit = await registry.carbonCredits(1);
-    expect(carbonCredit.metadataURI).to.equal(metadataURI);
-    expect(carbonCredit.issuer).to.equal(issuer.address);
-    expect(carbonCredit.verifier).to.equal(ethers.constants.AddressZero);
-    expect(carbonCredit.verified).to.be.false;
+  describe("Deployment", function () {
+    it("Should set the right owner", async function () {
+      expect(await carbonCreditBridge.owner()).to.equal(owner.address);
+    });
+
+    it("Should set the correct CarbonCreditERC1155 address", async function () {
+      expect(await carbonCreditBridge.carbonCreditERC1155()).to.equal(carbonCreditERC1155.address);
+    });
+
+    it("Should set the correct WrappedBCT address", async function () {
+      expect(await carbonCreditBridge.wrappedBCT()).to.equal(wrappedBCT.address);
+    });
   });
 
-  it("Should mint and offer carbon credits", async function () {
-    const metadataURI = "ipfs://metadataURI";
-    await registry.connect(issuer).registerCarbonCredits(metadataURI, issuer.address);
-    await registry.connect(issuer).mintAndOfferCarbonCredits(token.address, 1000);
-    const balance = await token.balanceOf(registry.address);
-    expect(balance).to.equal(1000);
-  });
+  describe("Token minting and bridging", function () {
+    it("Should mint and bridge tokens successfully", async function () {
+      const projectID = 1;
+      const amount = 100;
 
-  it("Should verify carbon credits", async function () {
-    const metadataURI = "ipfs://metadataURI";
-    await registry.connect(issuer).registerCarbonCredits(metadataURI, issuer.address);
-    await registry.connect(verifier).verifyCarbonCredits(1, verifier.address);
-    const carbonCredit = await registry.carbonCredits(1);
-    expect(carbonCredit.verifier).to.equal(verifier.address);
-    expect(carbonCredit.verified).to.be.true;
+      await carbonCreditBridge.connect(owner).mintAndBridge(projectID, addr1.address, amount);
+      expect(await carbonCreditERC1155.balanceOf(addr1.address, projectID)).to.equal(amount);
+    });
+
+    it("Should fail minting and bridging tokens if not owner", async function () {
+      const projectID = 1;
+      const amount = 100;
+
+      await expect(
+        carbonCreditBridge.connect(addr1).mintAndBridge(projectID, addr1.address, amount)
+      ).to.be.revertedWith("Ownable: caller is not the owner");
+    });
   });
 });

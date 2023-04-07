@@ -1,66 +1,53 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("Integration Tests", function () {
-  let MasterContract, RegistryContract, CO2Token, MarketplaceContract;
-  let master, registry, token, marketplace;
-  let owner, issuer, verifier, buyer, seller;
+describe("Carbon Credit System Integration", function () {
+  let WrappedBCT, wrappedBCT, CarbonCreditERC1155, carbonCreditERC1155, OffsetServiceContract, offsetServiceContract, owner, addr1, addr2, bctToken;
 
-  beforeEach(async () => {
-    // Deploy MasterContract
-    MasterContract = await ethers.getContractFactory("MasterContract");
-    master = await MasterContract.deploy();
-    await master.deployed();
+  beforeEach(async function () {
+    // Deploy CarbonCreditERC1155 contract
+    CarbonCreditERC1155 = await ethers.getContractFactory("CarbonCreditERC1155");
+    [owner, addr1, addr2, _] = await ethers.getSigners();
+    carbonCreditERC1155 = await CarbonCreditERC1155.deploy("https://example.com/metadata/");
 
-    // Deploy RegistryContract
-    RegistryContract = await ethers.getContractFactory("RegistryContract");
-    registry = await RegistryContract.deploy(master.address);
-    await registry.deployed();
+    // Deploy WrappedBCT contract
+    WrappedBCT = await ethers.getContractFactory("WrappedBCT");
+    wrappedBCT = await WrappedBCT.deploy(carbonCreditERC1155.address);
 
-    // Deploy CO2Token
-    CO2Token = await ethers.getContractFactory("CO2Token");
-    token = await CO2Token.deploy();
-    await token.deployed();
+    // Deploy OffsetServiceContract
+    OffsetServiceContract = await ethers.getContractFactory("OffsetServiceContract");
+    offsetServiceContract = await OffsetServiceContract.deploy(carbonCreditERC1155.address);
 
-    // Deploy MarketplaceContract
-    MarketplaceContract = await ethers.getContractFactory("MarketplaceContract");
-    marketplace = await MarketplaceContract.deploy(master.address);
-    await marketplace.deployed();
+    // Simulate BCT Token contract
+    bctToken = await ethers.getContractFactory("BCTToken");
+    bctToken = await bctToken.deploy("Toucan BCT Token", "BCT", 18);
 
-    // Get signers
-    [owner, issuer, verifier, buyer, seller] = await ethers.getSigners();
+    // Mint BCT tokens to addr1
+    await bctToken.connect(owner).mint(addr1.address, ethers.utils.parseEther("100"));
 
-    // Add roles
-    await master.addIssuer(issuer.address);
-    await master.addVerifier(verifier.address);
+    // Approve WrappedBCT contract to spend addr1's BCT tokens
+    await bctToken.connect(addr1).approve(wrappedBCT.address, ethers.utils.parseEther("100"));
   });
 
-  it("Should register, mint, offer, and buy carbon credits correctly", async function () {
-    // Register carbon credits
-    const carbonCreditsData = "QmRiW5M5S5MJ5q3y5Y1B5W1m8d4G4fJh8W8Cbb7Y5z6a5x";
-    await registry.connect(issuer).registerCarbonCredits(carbonCreditsData);
+  it("Should wrap BCT tokens, offset emissions, and unwrap BCT tokens successfully", async function () {
+    // Wrap BCT tokens
+    await wrappedBCT.connect(addr1).wrapBCTTokens(ethers.utils.parseEther("100"));
+    expect(await carbonCreditERC1155.balanceOf(addr1.address, 0)).to.equal(ethers.utils.parseEther("100"));
+    expect(await bctToken.balanceOf(addr1.address)).to.equal(0);
 
-    // Verify carbon credits
-    const carbonCreditsId = 1;
-    await registry.connect(verifier).verifyCarbonCredits(carbonCreditsId);
+    // Offset carbon emissions
+    await offsetServiceContract.connect(addr1).offsetCarbon(0, ethers.utils.parseEther("50"));
+    const receiptId = await offsetServiceContract.connect(addr1).getReceiptId(addr1.address);
+    expect(receiptId).to.equal(1);
 
-    // Mint and offer carbon credits
-    const amountToMint = ethers.utils.parseUnits("1000", 18);
-    await token.connect(issuer).mint(marketplace.address, amountToMint);
-    await marketplace.connect(issuer).offerCarbonCredits(carbonCreditsId, amountToMint);
+    const receipt = await carbonCreditERC1155.connect(addr1).uri(receiptId);
+    expect(receipt).to.equal("https://example.com/metadata/1");
 
-    // Buy carbon credits
-    const amountToBuy = ethers.utils.parseUnits("200", 18);
-    const purchasePrice = ethers.utils.parseUnits("0.1", 18);
-    await buyer.sendTransaction({ to: marketplace.address, value: purchasePrice });
-    await marketplace.connect(buyer).buyCarbonCredits(carbonCreditsId, amountToBuy);
+    expect(await carbonCreditERC1155.balanceOf(addr1.address, 0)).to.equal(ethers.utils.parseEther("50"));
 
-    // Check balances
-    const buyerBalance = await token.balanceOf(buyer.address);
-    const marketplaceBalance = await ethers.provider.getBalance(marketplace.address);
-
-    expect(buyerBalance).to.equal(amountToBuy);
-    expect(marketplaceBalance).to.equal(purchasePrice);
+    // Unwrap BCT tokens
+    await wrappedBCT.connect(addr1).unwrapBCTTokens(ethers.utils.parseEther("50"));
+    expect(await carbonCreditERC1155.balanceOf(addr1.address, 0)).to.equal(0);
+    expect(await bctToken.balanceOf(addr1.address)).to.equal(ethers.utils.parseEther("50"));
   });
 });
-
