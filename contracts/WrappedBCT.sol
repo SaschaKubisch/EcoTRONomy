@@ -13,12 +13,19 @@ contract WrappedBCT is Ownable {
         tokenId = _tokenId;
     }
 
-    function wrap(address user, uint256 amount) external onlyOwner {
-        require(wrappedToken.transferFrom(user, address(this), amount), "WrappedBCT: Transfer failed");
+    function wrap(address user, uint256 amount) external {
+        require(
+            wrappedToken.transferFrom(user, address(this), amount),
+            "WrappedBCT: Transfer failed"
+        );
     }
 
+
     function unwrap(address user, uint256 amount) external onlyOwner {
-        require(wrappedToken.transfer(user, amount), "WrappedBCT: Transfer failed");
+        require(
+            wrappedToken.transfer(user, amount),
+            "WrappedBCT: Transfer failed"
+        );
     }
 
     function getTokenId() external view returns (uint256) {

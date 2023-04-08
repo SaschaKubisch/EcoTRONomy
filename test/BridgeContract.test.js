@@ -1,54 +1,71 @@
-const { expect } = require("chai");
-const { ethers } = require("hardhat");
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
-describe("CarbonCreditBridgeContract", function () {
-  let CarbonCreditBridge, carbonCreditBridge, CarbonCreditERC1155, carbonCreditERC1155, WrappedBCT, wrappedBCT, owner, addr1, addr2;
+import { ethers } from 'hardhat';
+import { expect } from 'chai';
 
-  beforeEach(async function () {
+import { CarbonCreditBridge } from '../contracts/CarbonCreditBridge.sol';
+import { WrappedBCT } from '../contracts/WrappedBCT.sol';
+import { CarbonCreditERC1155 } from '../contracts/CarbonCreditERC1155.sol';
+
+describe('CarbonCreditBridge', function () {
+  let owner;
+  let user;
+  let carbonCreditBridge;
+  let wrappedToken;
+  let carbonCreditERC1155;
+
+  before(async function () {
+    [owner, user] = await ethers.getSigners();
+
     // Deploy CarbonCreditERC1155 contract
-    CarbonCreditERC1155 = await ethers.getContractFactory("CarbonCreditERC1155");
-    [owner, addr1, addr2, _] = await ethers.getSigners();
-    carbonCreditERC1155 = await CarbonCreditERC1155.deploy("https://example.com/metadata/");
-    
+    carbonCreditERC1155 = await (
+      await ethers.getContractFactory('CarbonCreditERC1155')
+    ).deploy('https://example.com/{id}.json');
+
     // Deploy WrappedBCT contract
-    WrappedBCT = await ethers.getContractFactory("WrappedBCT");
-    wrappedBCT = await WrappedBCT.deploy(carbonCreditERC1155.address);
+    wrappedToken = await (
+      await ethers.getContractFactory('WrappedBCT')
+    ).deploy(
+      carbonCreditERC1155.address,
+      1
+    );
 
-    // Deploy CarbonCreditBridgeContract
-    CarbonCreditBridge = await ethers.getContractFactory("CarbonCreditBridgeContract");
-    carbonCreditBridge = await CarbonCreditBridge.deploy(carbonCreditERC1155.address, wrappedBCT.address);
+    // Deploy CarbonCreditBridge contract
+    carbonCreditBridge = await (
+      await ethers.getContractFactory('CarbonCreditBridge')
+    ).deploy(carbonCreditERC1155.address);
+
+    // Add WrappedBCT as supported wrapper
+    await carbonCreditBridge.addSupportedWrapper(wrappedToken.address);
   });
 
-  describe("Deployment", function () {
-    it("Should set the right owner", async function () {
-      expect(await carbonCreditBridge.owner()).to.equal(owner.address);
-    });
+  it('should wrap tokens', async function () {
+    const amount = ethers.BigNumber.from('1000000000000000000'); // 1 BCT
 
-    it("Should set the correct CarbonCreditERC1155 address", async function () {
-      expect(await carbonCreditBridge.carbonCreditERC1155()).to.equal(carbonCreditERC1155.address);
-    });
+    // Transfer BCT tokens to user
+    await wrappedToken.wrappedToken().transfer(user.address, amount);
 
-    it("Should set the correct WrappedBCT address", async function () {
-      expect(await carbonCreditBridge.wrappedBCT()).to.equal(wrappedBCT.address);
-    });
-  });
+    // Approve CarbonCreditBridge to transfer BCT tokens
+    await wrappedToken.wrappedToken().approve(
+      carbonCreditBridge.address,
+      amount
+    );
 
-  describe("Token minting and bridging", function () {
-    it("Should mint and bridge tokens successfully", async function () {
-      const projectID = 1;
-      const amount = 100;
+    // Wrap BCT tokens
+    await carbonCreditBridge.wrapTokens(wrappedToken.address, amount);
 
-      await carbonCreditBridge.connect(owner).mintAndBridge(projectID, addr1.address, amount);
-      expect(await carbonCreditERC1155.balanceOf(addr1.address, projectID)).to.equal(amount);
-    });
+    // Check user's balance of WrappedBCT tokens
+    expect(await wrappedToken.balanceOf(user.address)).to.equal(amount);
 
-    it("Should fail minting and bridging tokens if not owner", async function () {
-      const projectID = 1;
-      const amount = 100;
+    // Check user's balance of carbon credits
+    expect(
+      await carbonCreditERC1155.balanceOf(user.address, wrappedToken.tokenId())
+    ).to.equal(amount);
 
-      await expect(
-        carbonCreditBridge.connect(addr1).mintAndBridge(projectID, addr1.address, amount)
-      ).to.be.revertedWith("Ownable: caller is not the owner");
-    });
+    // Check total supply of carbon credits
+    expect(
+      await carbonCreditERC1155.totalSupply(wrappedToken.tokenId())
+    ).to.equal(amount);
   });
 });
