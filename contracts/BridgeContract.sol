@@ -1,38 +1,35 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./WrappedBCT.sol";
 import "./ERC1155Token.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract CarbonCreditBridgeContract is Ownable {
-    WrappedBCT public wrappedBCT;
-    ERC1155Token public erc1155Token;
+contract CarbonCreditBridge is Ownable {
+    CarbonCreditERC1155 public carbonCreditERC1155;
+    mapping(address => bool) public supportedWrappers;
 
-    constructor(
-        WrappedBCT _wrappedBCT,
-        ERC1155Token _erc1155Token
-    ) {
-        wrappedBCT = _wrappedBCT;
-        erc1155Token = _erc1155Token;
+    constructor(address _carbonCreditERC1155) {
+        carbonCreditERC1155 = CarbonCreditERC1155(_carbonCreditERC1155);
     }
 
-    function bridgeToucanBCT(address to, uint256 amount) external {
+    function addSupportedWrapper(address wrapperAddress) external onlyOwner {
+        supportedWrappers[wrapperAddress] = true;
+    }
+
+    function removeSupportedWrapper(address wrapperAddress) external onlyOwner {
+        supportedWrappers[wrapperAddress] = false;
+    }
+
+    function wrapTokens(address wrapperAddress, uint256 amount) external {
         require(
-            wrappedBCT.balanceOf(msg.sender) >= amount,
-            "Not enough Wrapped BCT tokens"
+            supportedWrappers[wrapperAddress],
+            "CarbonCreditBridge: Unsupported wrapper"
         );
-
-        uint256 tokenId = erc1155Token.getNextTokenID();
-
-        // Burn original Toucan BCT tokens
-        wrappedBCT.burnFrom(msg.sender, amount);
-
-        // Mint new ERC1155 carbon credits
-        erc1155Token.mintFungibleToken(to, tokenId, amount, "");
-
-        emit BridgedToucanBCT(msg.sender, to, tokenId, amount);
+        WrappedBCT wrapper = WrappedBCT(wrapperAddress);
+        wrapper.wrap(msg.sender, amount);
+        uint256 tokenId = wrapper.getTokenId();
+        carbonCreditERC1155.mint(msg.sender, tokenId, amount, "");
     }
-
-    event BridgedToucanBCT(address indexed from, address indexed to, uint256 tokenId, uint256 amount);
 }

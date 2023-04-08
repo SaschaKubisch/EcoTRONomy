@@ -9,38 +9,39 @@ contract CarbonCreditERC1155 is ERC1155, Ownable {
 
     constructor(string memory uri) ERC1155(uri) {}
 
-    function mintFungibleToken(
+    function mint(
         address to,
         uint256 id,
         uint256 amount,
         bytes memory data
-    ) external onlyOwner {
+    ) external {
+        require(msg.sender == owner() || msg.sender == address(this), "CarbonCreditERC1155: Only owner or the contract itself can mint tokens");
         _mint(to, id, amount, data);
+    }
+
+    function mintFungibleToken(
+        address to,
+        uint256 amount,
+        bytes memory data
+    ) external onlyOwner {
+        _mint(to, _currentTokenID, amount, data);
+        _currentTokenID += 1;
     }
 
     function mintNonFungibleToken(
         address to,
-        uint256 id,
         bytes memory data
     ) external onlyOwner {
-        _mint(to, id, 1, data);
+        _mint(to, _currentTokenID, 1, data);
+        _currentTokenID += 1;
     }
 
-    function burnFungibleToken(
+    function burn(
         address account,
         uint256 id,
         uint256 amount
     ) external onlyOwner {
         _burn(account, id, amount);
-    }
-
-    function burnNonFungibleToken(address account, uint256 id) external onlyOwner {
-        _burn(account, id, 1);
-    }
-
-    function getNextTokenID() external onlyOwner returns (uint256) {
-        _currentTokenID += 1;
-        return _currentTokenID;
     }
 
     function setURI(string memory newuri) external onlyOwner {

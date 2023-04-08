@@ -1,22 +1,27 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract WrappedBCT is ERC20, Ownable {
-    constructor() ERC20("Wrapped BCT", "WBCT") {}
+contract WrappedBCT is Ownable {
+    IERC20 public wrappedToken;
+    uint256 public tokenId;
 
-    function mint(address to, uint256 amount) external onlyOwner {
-        _mint(to, amount);
+    constructor(address _wrappedToken, uint256 _tokenId) {
+        wrappedToken = IERC20(_wrappedToken);
+        tokenId = _tokenId;
     }
 
-    function burn(address from, uint256 amount) external onlyOwner {
-        _burn(from, amount);
+    function wrap(address user, uint256 amount) external onlyOwner {
+        require(wrappedToken.transferFrom(user, address(this), amount), "WrappedBCT: Transfer failed");
     }
 
-    function burnFrom(address from, uint256 amount) external {
-        require(balanceOf(from) >= amount, "Not enough Wrapped BCT tokens");
-        _burn(from, amount);
+    function unwrap(address user, uint256 amount) external onlyOwner {
+        require(wrappedToken.transfer(user, amount), "WrappedBCT: Transfer failed");
+    }
+
+    function getTokenId() external view returns (uint256) {
+        return tokenId;
     }
 }
