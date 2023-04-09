@@ -8,15 +8,15 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract OffsetServiceContract is ERC1155, Ownable {
+contract Offset is ERC1155, Ownable {
     uint256 private _currentNFTId;
 
-    CarbonCreditBridge private _carbonCreditBridge;
-    CarbonCreditERC1155 private _carbonCreditERC1155;
+    Bridge private _bridge;
+    ERC1155Token private _erc1155Token;
 
-    constructor(address carbonCreditBridgeAddress, address carbonCreditERC1155Address, string memory uri) ERC1155(uri) {
-        _carbonCreditBridge = CarbonCreditBridge(carbonCreditBridgeAddress);
-        _carbonCreditERC1155 = CarbonCreditERC1155(carbonCreditERC1155Address);
+    constructor(address bridgeAddress, address erc1155TokenAddress, string memory uri) ERC1155(uri) {
+        _bridge = Bridge(bridgeAddress);
+        _erc1155Token = ERC1155Token(erc1155TokenAddress);
     }
 
     function offsetCarbonCredits(
@@ -25,12 +25,12 @@ contract OffsetServiceContract is ERC1155, Ownable {
         uint256 amount
     ) external {
         require(
-            _carbonCreditERC1155.balanceOf(user, tokenId) >= amount,
+            _erc1155Token.balanceOf(user, tokenId) >= amount,
             "Not enough carbon credits"
         );
 
         // Burn carbon credits
-        _carbonCreditERC1155.burn(user, tokenId, amount);
+        _erc1155Token.burn(user, tokenId, amount);
 
         // Mint NFT receipt
         _mint(user, _currentNFTId, 1, "");

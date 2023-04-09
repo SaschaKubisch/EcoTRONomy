@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract CarbonCreditERC1155 is ERC1155, Ownable {
+contract ERC1155Token is ERC1155, Ownable {
     uint256 private _currentTokenID = 1;
 
     constructor(string memory uri) ERC1155(uri) {}
@@ -15,7 +15,7 @@ contract CarbonCreditERC1155 is ERC1155, Ownable {
         uint256 amount,
         bytes memory data
     ) external {
-        require(msg.sender == owner() || msg.sender == address(this), "CarbonCreditERC1155: Only owner or the contract itself can mint tokens");
+        require(msg.sender == owner() || msg.sender == address(this), "ERC1155Token: Only owner or the contract itself can mint tokens");
         _mint(to, id, amount, data);
     }
 
