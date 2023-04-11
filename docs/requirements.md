@@ -16,6 +16,8 @@ The project requires a blockchain network, such as Ethereum or Binance Smart Cha
 
 The project requires the use of IPFS or a similar decentralized storage system for storing metadata associated with the ERC1155 tokens.
 
+Communicate with smart contracts via DApp frontend, Web3.js, and Infura.
+
 Functional requirements:
 
 Users should be able to buy and sell carbon credits as ERC1155 tokens on the exchange.
@@ -56,3 +58,5 @@ The frontend should be developed using React.js and should interact with the TRO
 The frontend should have separate interfaces for customers and treasury wallets to access the respective functionalities.
 
 The frontend should be responsive and user-friendly.
+
+Communicate with smart contracts via DApp frontend, Web3.js, and Infura.

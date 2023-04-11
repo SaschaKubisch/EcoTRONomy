@@ -1,0 +1,41 @@
+.sell-carbon-credits {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+  }
+  
+  .sell-carbon-credits h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .sell-carbon-credits form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .sell-carbon-credits label {
+    margin-bottom: 0.5rem;
+  }
+  
+  .sell-carbon-credits input,
+  .sell-carbon-credits select {
+    margin-left: 0.5rem;
+  }
+  
+  .sell-carbon-credits button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .sell-carbon-credits button:hover {
+    background-color: #45a049;
+  }
+  
