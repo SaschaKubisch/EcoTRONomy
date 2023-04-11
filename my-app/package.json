@@ -36,6 +36,7 @@
     ]
   },
   "devDependencies": {
+    "@web3-react/core": "^6.1.9",
     "web3": "^1.9.0"
   }
 }

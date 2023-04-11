@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Marketplace } from "../../contracts";
-import { web3 } from "../../utils/web3config.js";
+import { Marketplace } from "../../contracts/Marketplace.json";
+import web3 from '../../utils/web3Config';
 import "./SellCarbonCredits.css";
 
 const SellCarbonCredits = ({ userAddress }) => {
   const [tokenId, setTokenId] = useState("");
   const [amount, setAmount] = useState("");
-  const [pricePerToken, setPricePerToken] = useState("");
+  const [pricePerToken, setPricePerToken] = useState("")
   const [isTRX, setIsTRX] = useState(true);
 
   const handleSubmit = async (event) => {

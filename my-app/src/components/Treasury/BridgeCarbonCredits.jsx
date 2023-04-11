@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 // import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
-import { bridgeABI, bridgeAddress } from '../../web3config';
+import web3 from '../../utils/web3Config';
 import './BridgeCarbonCredits.css';
+import { useWeb3React } from '@web3-react/core';
+
 
 const BridgeCarbonCredits = () => {
     const { account, library } = useWeb3React();

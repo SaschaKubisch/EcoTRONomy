@@ -1,6 +1,6 @@
 // BuyCarbonCredits.jsx
 import React, { useState } from "react";
-import web3 from "../../utils/web3Config.js";
+import web3 from '../../utils/web3Config';
 import Marketplace from "../../contracts/Marketplace.json";
 import "./BuyCarbonCredits.css";
 

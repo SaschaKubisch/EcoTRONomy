@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 // import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
-import { treasuryABI, wrappedBCTAddress } from '../../web3config';
+import web3 from '../../utils/web3Config';
 import './WrapCarbonCredits.css';
+import { useWeb3React } from '@web3-react/core';
+
 
 const WrapCarbonCredits = () => {
     const { account, library } = useWeb3React();

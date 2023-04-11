@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './OffsetCarbonFootprint.css';
-import { web3 } from '../../utils/web3config';
-import { Offset } from '../../../contracts';
+import web3 from '../../utils/web3Config';
+import { Offset } from '../../contracts/Offset.json';
 
 const OffsetCarbonFootprint = () => {
     const { account } = web3();
