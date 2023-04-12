@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./WrappedBCT.sol";
 import "./ERC1155Token.sol";
-import "./Bridge.sol";
+import "./BridgeContract.sol";
 
 contract Treasury is Ownable {
     ERC1155Token public erc1155Token;
