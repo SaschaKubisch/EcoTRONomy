@@ -1,20 +1,23 @@
 import React, { useState } from "react";
-import { Marketplace } from "../../contracts/Marketplace.json";
-import web3 from '../../utils/web3Config';
+import tronWeb from "../../utils/tronWeb";
+import { marketplace } from "../../utils/contracts";
 import "./SellCarbonCredits.css";
 
 const SellCarbonCredits = ({ userAddress }) => {
   const [tokenId, setTokenId] = useState("");
   const [amount, setAmount] = useState("");
-  const [pricePerToken, setPricePerToken] = useState("")
+  const [pricePerToken, setPricePerToken] = useState("");
   const [isTRX, setIsTRX] = useState(true);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      await Marketplace.methods
-        .createListing(tokenId, amount, pricePerToken, isTRX)
-        .send({ from: userAddress });
+      await marketplace.createListing(
+        tokenId,
+        amount,
+        pricePerToken,
+        isTRX
+      ).send({ from: userAddress });
     } catch (error) {
       console.error("Error creating listing:", error);
     }

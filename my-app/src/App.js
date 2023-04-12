@@ -31,7 +31,7 @@ function App() {
   // Replace this with the actual function to check if the address is a treasury.
   const checkIfTreasury = async (address) => {
     // TODO: Check if the address is a treasury
-    return false;
+    return true;
   };
 
   return (

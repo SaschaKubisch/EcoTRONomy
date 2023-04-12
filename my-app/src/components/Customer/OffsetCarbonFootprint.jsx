@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 import './OffsetCarbonFootprint.css';
-import web3 from '../../utils/web3Config';
-import { Offset } from '../../contracts/Offset.json';
+import tronWeb from "../../utils/tronWeb";
+
+import { offset } from '../../utils/contracts';
 
 const OffsetCarbonFootprint = () => {
-    const { account } = web3();
     const [tokenId, setTokenId] = useState('');
     const [amount, setAmount] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const offset = new window.web3.eth.Contract(Offset.abi, Offset.address);
-            await offset.methods.offsetCarbonCredits(account, tokenId, amount).send({ from: account });
+            await offset.offsetCarbonCredits(tokenId, amount).send({ from: tronWeb.defaultAddress.base58 });
         } catch (error) {
             console.error('Error offsetting carbon credits:', error);
         }

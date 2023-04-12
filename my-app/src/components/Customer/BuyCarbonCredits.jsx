@@ -1,9 +1,11 @@
 // BuyCarbonCredits.jsx
 import React, { useState } from "react";
-import web3 from '../../utils/web3Config';
-import Marketplace from "../../contracts/Marketplace.json";
+// Remove the following line
+// import web3 from '../../utils/web3Config';
+// Add the following line
+import tronWeb from "../../utils/tronWeb";
+import { marketplace } from "../../utils/contracts";
 import "./BuyCarbonCredits.css";
-
 
 const BuyCarbonCredits = () => {
   const [tokenId, setTokenId] = useState("");
@@ -12,20 +14,15 @@ const BuyCarbonCredits = () => {
 
   const buyCarbonCredits = async (e) => {
     e.preventDefault();
-
-    const marketplaceAddress = "0x..."; // Replace with the address of your local deployed Marketplace contract
-
-
-    const accounts = await web3.eth.getAccounts();
-    const marketplace = new web3.eth.Contract(Marketplace.abi, marketplaceAddress);
-
+  
     try {
-      const tx = await marketplace.methods.buyListing(
+      const tx = await marketplace.buyListing(
         tokenId,
         amount
       ).send({
-        from: accounts[0],
-        value: web3.utils.toWei(paymentMethod === "trx" ? "1" : "0", "ether")
+        // Replace the following line
+        // value: web3.utils.toWei(paymentMethod === "trx" ? "1" : "0", "ether")
+        callValue: paymentMethod === "trx" ? tronWeb.toSun("1") : tronWeb.toSun("0")
       });
       alert("Successfully bought carbon credits!");
     } catch (err) {
@@ -33,6 +30,7 @@ const BuyCarbonCredits = () => {
       alert("Failed to buy carbon credits.");
     }
   };
+
 
   return (
     <div className="buy-carbon-credits">

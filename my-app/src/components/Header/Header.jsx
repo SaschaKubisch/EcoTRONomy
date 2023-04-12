@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
 import TronWeb from "tronweb";
-import SellCarbonCredits from '../Customer/SellCarbonCredits';
 import "./Header.css";
 
 const Header = () => {
   const [address, setAddress] = useState("");
-  const [tronWeb, setTronWeb] = useState(null);
+  const [tronWebInstance, setTronWebInstance] = useState(null);
 
   useEffect(() => {
     const connectTronLink = async () => {
-      if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
-        setTronWeb(window.tronWeb);
-        setAddress(window.tronWeb.defaultAddress.base58);
+      if (window.TronWeb && window.TronWeb.defaultAddress.base58) {
+        setTronWebInstance(window.TronWeb);
+        setAddress(window.TronWeb.defaultAddress.base58);
       } else {
         setTimeout(connectTronLink, 500);
       }
@@ -33,7 +32,6 @@ const Header = () => {
           )}
         </div>
       </div>
-      <SellCarbonCredits userAddress={address} />
     </header>
   );
 };
