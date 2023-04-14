@@ -1,8 +1,16 @@
 const port = process.env.HOST_PORT || 9090
-const solc = require('solc');
 
 module.exports = {
   networks: {
+    development: {
+      from: 'TYenvwfVbizJg6eHFRkaghp6Vc6zeqXY2r', // Your local Tron address
+      privateKey: 'cfc453e70fa3c17fe6bf498c338d0bf9a7e3548134bc6bfd75f670deb69dfdb4', // Your local Tron private key
+      consume_user_resource_percent: 30,
+      fee_limit: 100000000,
+      host: '127.0.0.1', // Local Tron node
+      port: 9090, // The port that your local Tron node is running on
+      network_id: '*', // Match any network id
+    },
     mainnet: {
       // Don't put your private key here:
       privateKey: process.env.PRIVATE_KEY_MAINNET,
@@ -37,26 +45,24 @@ Then, run the migration with:
     },
     development: {
       // For tronbox/tre docker image
-      from: "TW2Eokv3CTTPQ6qNPyucnkZbNxm4sPH4s8",
-      privateKey: 'becdebcb1aea54a9473218831906976d5788e5ba07ecd6a104032e5f2c702b51',
+      privateKey: '0000000000000000000000000000000000000000000000000000000000000001',
       userFeePercentage: 0,
       feeLimit: 1000 * 1e6,
-      fullHost: 'https://nile.trongrid.io',
-      network_id: '*'
+      fullHost: 'http://127.0.0.1:' + port,
+      network_id: '9'
     },
     compilers: {
       solc: {
-        version: '0.8.6', // Replace '0.8.6' with solc
+        version: '0.8.6'
       }
     }
   },
-  contracts_directory: './contracts',
   // solc compiler optimize
   solc: {
-    version: '0.8.6',
-    optimizer: {
-      enabled: true,
-      runs: 200
-    }
+  //   optimizer: {
+  //     enabled: true,
+  //     runs: 200
+  //   },
+  //   evmVersion: 'istanbul'
   }
 }
