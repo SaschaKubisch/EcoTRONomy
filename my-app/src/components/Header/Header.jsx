@@ -1,5 +1,5 @@
+// Header.js
 import React, { useState, useEffect } from "react";
-import TronWeb from "tronweb";
 import "./Header.css";
 
 const Header = () => {
@@ -8,15 +8,15 @@ const Header = () => {
 
   useEffect(() => {
     const connectTronLink = async () => {
-      if (window.TronWeb && window.TronWeb.defaultAddress.base58) {
-        setTronWebInstance(window.TronWeb);
-        setAddress(window.TronWeb.defaultAddress.base58);
+      if (window.tronWeb && window.tronWeb.ready) {
+        setAddress(window.tronWeb.defaultAddress.base58);
       } else {
         setTimeout(connectTronLink, 500);
       }
     };
     connectTronLink();
   }, []);
+  
 
   return (
     <header className="header">

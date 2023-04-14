@@ -16,18 +16,17 @@ function App() {
   const [address, setAddress] = useState('');
 
   useEffect(() => {
-    if (tronWeb && tronWeb.ready) {
-      setAddress(tronWeb.defaultAddress.base58);
-      setConnected(true);
-      // Replace the 'checkIfTreasury()' function with the actual function to check if the address is a treasury.
-      checkIfTreasury(address).then((isTreasury) => {
-        if (isTreasury) {
-          setUserType('treasury');
-        }
-      });
-    }
-  }, [address]);
-
+    const connectTronLink = async () => {
+      if (window.tronWeb && window.tronWeb.ready) {
+        setAddress(window.tronWeb.defaultAddress.base58);
+        setConnected(true);
+      } else {
+        setTimeout(connectTronLink, 500);
+      }
+    };
+    connectTronLink();
+  }, []);
+  
   // Replace this with the actual function to check if the address is a treasury.
   const checkIfTreasury = async (address) => {
     // TODO: Check if the address is a treasury
