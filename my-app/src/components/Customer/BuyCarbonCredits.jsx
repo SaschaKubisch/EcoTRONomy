@@ -7,7 +7,12 @@ import tronWeb from "../../utils/tronWeb";
 import { marketplace } from "../../utils/contracts";
 import "./BuyCarbonCredits.css";
 
+
+
+
+
 const BuyCarbonCredits = () => {
+  const userAddress = tronWeb.defaultAddress.base58;
   const [tokenId, setTokenId] = useState("");
   const [amount, setAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("trx");
@@ -20,10 +25,10 @@ const BuyCarbonCredits = () => {
         tokenId,
         amount
       ).send({
-        // Replace the following line
-        // value: web3.utils.toWei(paymentMethod === "trx" ? "1" : "0", "ether")
-        callValue: paymentMethod === "trx" ? tronWeb.toSun("1") : tronWeb.toSun("0")
+        callValue: paymentMethod === "trx" ? tronWeb.toSun("1") : tronWeb.toSun("0"),
+        from: userAddress
       });
+      
       alert("Successfully bought carbon credits!");
     } catch (err) {
       console.error(err);

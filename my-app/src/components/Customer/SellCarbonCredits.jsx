@@ -3,7 +3,8 @@ import tronWeb from "../../utils/tronWeb";
 import { marketplace } from "../../utils/contracts";
 import "./SellCarbonCredits.css";
 
-const SellCarbonCredits = ({ userAddress }) => {
+const SellCarbonCredits = () => {
+  const userAddress = tronWeb.defaultAddress.hex;
   const [tokenId, setTokenId] = useState("");
   const [amount, setAmount] = useState("");
   const [pricePerToken, setPricePerToken] = useState("");

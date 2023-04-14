@@ -1,23 +1,17 @@
 import React, { useState } from 'react';
-// import { useWeb3React } from '@web3-react/core';
-import { ethers } from 'ethers';
-import web3 from '../../utils/web3Config';
 import './WrapCarbonCredits.css';
-import { useWeb3React } from '@web3-react/core';
-
+import tronWeb from '../../utils/tronWeb';
+import { wrappedBCT } from '../../utils/contracts';
 
 const WrapCarbonCredits = () => {
-    const { account, library } = useWeb3React();
     const [amount, setAmount] = useState('');
 
     const wrapCarbonCredits = async () => {
-        if (!account) return;
+        if (!tronWeb.defaultAddress.hex) return;
 
-        const parsedAmount = ethers.utils.parseUnits(amount, 18);
-        const treasuryContract = new ethers.Contract(wrappedBCTAddress, treasuryABI, library.getSigner());
+        const parsedAmount = tronWeb.toSun(amount);
         try {
-            const tx = await treasuryContract.wrap(parsedAmount, { from: account });
-            await tx.wait();
+            const tx = await wrappedBCT.wrap(parsedAmount).send({ from: tronWeb.defaultAddress.hex });
             alert('Carbon credits wrapped successfully!');
         } catch (error) {
             console.error('Error wrapping carbon credits:', error);

@@ -7,7 +7,7 @@ import OffsetCarbonFootprint from './components/Customer/OffsetCarbonFootprint';
 import WrapCarbonCredits from './components/Treasury/WrapCarbonCredits';
 import BridgeCarbonCredits from './components/Treasury/BridgeCarbonCredits';
 
-import tronWeb from './utils/web3Config';
+import tronWeb from './utils/tronWeb';
 
 
 function App() {

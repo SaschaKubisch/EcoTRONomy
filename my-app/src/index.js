@@ -1,21 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-
-import { Web3ReactProvider } from '@web3-react/core';
-import { Web3Provider } from '@ethersproject/providers';
+import { Buffer } from 'buffer';
 import './index.css';
 import App from './App';
 
-function getLibrary(provider) {
-  return new Web3Provider(provider);
-}
+window.Buffer = Buffer;
 
 ReactDOM.render(
   <React.StrictMode>
-    <Web3ReactProvider getLibrary={getLibrary}>
-      <App />
-    </Web3ReactProvider>
+    <App />
   </React.StrictMode>,
   document.getElementById('root')
 );
-

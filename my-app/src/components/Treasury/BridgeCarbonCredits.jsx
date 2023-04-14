@@ -1,24 +1,18 @@
 import React, { useState } from 'react';
-// import { useWeb3React } from '@web3-react/core';
-import { ethers } from 'ethers';
-import web3 from '../../utils/web3Config';
 import './BridgeCarbonCredits.css';
-import { useWeb3React } from '@web3-react/core';
-
+import tronWeb from '../../utils/tronWeb';
+import { bridge } from '../../utils/contracts';
 
 const BridgeCarbonCredits = () => {
-    const { account, library } = useWeb3React();
     const [wrapperAddress, setWrapperAddress] = useState('');
     const [amount, setAmount] = useState('');
 
     const bridgeCarbonCredits = async () => {
-        if (!account) return;
+        if (!tronWeb.defaultAddress.hex) return;
 
-        const parsedAmount = ethers.utils.parseUnits(amount, 18);
-        const bridgeContract = new ethers.Contract(bridgeAddress, bridgeABI, library.getSigner());
+        const parsedAmount = tronWeb.toSun(amount);
         try {
-            const tx = await bridgeContract.bridge(wrapperAddress, parsedAmount, { from: account });
-            await tx.wait();
+            const tx = await bridge.bridge(wrapperAddress, parsedAmount).send({ from: tronWeb.defaultAddress.hex });
             alert('Carbon credits bridged successfully!');
         } catch (error) {
             console.error('Error bridging carbon credits:', error);
