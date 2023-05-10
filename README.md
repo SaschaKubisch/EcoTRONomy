@@ -1,7 +1,5 @@
 # EcoTRONomy
 
-![EcoTRONomy Banner](assets/banner.png)
-
 EcoTRONomy is an innovative project that integrates carbon offsetting mechanisms into the TRON blockchain. This project leverages the power of blockchain technology to create a more sustainable world.
 
 ## 🚀 Features
