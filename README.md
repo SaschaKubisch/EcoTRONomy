@@ -6,7 +6,7 @@ EcoTRONomy is an innovative project that integrates carbon offsetting mechanisms
 
 - **Carbon Offset Transactions**: Users can initiate carbon offset transactions through the TRON network, specifying the receiver address, the amount of funds, and the offset type and amount.
 - **Carbon Offset API**: The API calculates the required carbon offset amount, allows selection of carbon credits, and manages transaction processing and receipts.
-- **Smart Contracts**: Secure and efficient smart contracts for managing carbon credit pooling, burning, and interchain NFT receipt generation.
+- **Smart Contracts**: Secure and efficient smart contracts for managing carbon credit bridging, pooling, burning, and NFT receipt generation.
 - **Database Management**: Robust system for storing transaction data, carbon offset details, and receipts.
 - **Monitoring and Analytics**: Tools for tracking system performance, API usage, and carbon offsetting statistics.
 - **Comprehensive Documentation**: Detailed documentation for the Carbon Offset API, smart contracts, and system architecture.
