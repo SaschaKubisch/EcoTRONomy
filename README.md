@@ -1,6 +1,6 @@
 # EcoTRONomy
 
-EcoTRONomy is an innovative project that integrates carbon offsetting mechanisms into the TRON blockchain. This project leverages the power of blockchain technology to enable liquidity and versatility of carbon credits by bridging them to the TRON ecosystem.
+EcoTRONomy is an innovative project that integrates carbon offsetting mechanisms into the TRON blockchain. This project leverages the power of blockchain technology to enable liquidity and versatility of carbon credits by tokenizing and bridging them to the TRON ecosystem.
 
 ## 🚀 Features
 
