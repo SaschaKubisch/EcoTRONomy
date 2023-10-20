@@ -37,7 +37,7 @@ npm start
 ## 🌍 Environment Variables
 Please set up the following environment variables:
 
-TRON_API_KEY: Your TRON API key.
+PRIVATE_KEY: The private key for your master wallet (Be careful not to publish yor .env file)
 DATABASE_URL: Your database connection string.
 Please refer to the Configuration section for more details on how to set up these environment variables.
 
@@ -48,19 +48,7 @@ To run unit tests:
 npm test
 ```
 
-To run integration tests:
 
-```bash
-npm run test:integration
-```
-
-## 🔧 Configuration
-You can configure the application using environment variables or a .env file at the root of your project. Here is an example .env file:
-
-```bash
-TRON_API_KEY=your_tron_api_key
-DATABASE_URL=your_database_url
-```
 ## 🤝 Contribution
 Contributions are always welcome! 
 
