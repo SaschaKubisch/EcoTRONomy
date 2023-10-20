@@ -36,8 +36,9 @@ npm start
 Please set up the following environment variables:
 
 PRIVATE_KEY: The private key for your master wallet (Be careful not to publish yor .env file)
+
 DATABASE_URL: Your database connection string.
-Please refer to the Configuration section for more details on how to set up these environment variables.
+
 
 ## 🧪 Testing
 To run unit tests:
